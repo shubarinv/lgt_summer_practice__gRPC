@@ -11,11 +11,13 @@ service FileTransferService {
 message ChunkMsg {
   string FileName = 1;
   int64 FileSize = 2;
+  string Md5Cache = 3;
 
-  int32 ChunkSize = 3;
-  bytes Chunk = 4;
+  int32 ChunkSize = 4;
+  bytes Chunk = 5;
 
-  bool IsCanceled = 5;
+  bool IsCanceled = 6;
+
 }
 
 message FileRequest {

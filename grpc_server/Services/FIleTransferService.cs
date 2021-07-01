@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Grpc.Core;
@@ -29,7 +31,8 @@ namespace grpc_server
                 var chunk = new ChunkMsg
                 {
                     FileName = Path.GetFileName(filePath),
-                    FileSize = fileInfo.Length
+                    FileSize = fileInfo.Length,
+                    Md5Cache = CalculateMd5(filePath)
                 };
 
                 const int chunkSize = 64 * 1024;
@@ -51,8 +54,18 @@ namespace grpc_server
 
                     chunk.ChunkSize = length;
                     chunk.Chunk = ByteString.CopyFrom(fileChunk);
-
                     await responseStream.WriteAsync(chunk).ConfigureAwait(false);
+                }
+            }
+        }
+
+        private static string CalculateMd5(string filename)
+        {
+            using (var md5 = MD5.Create())
+            {
+                using (var stream = File.OpenRead(filename))
+                {
+                    return Encoding.Default.GetString(md5.ComputeHash(stream));
                 }
             }
         }
