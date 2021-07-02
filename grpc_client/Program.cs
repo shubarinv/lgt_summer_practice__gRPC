@@ -83,7 +83,7 @@ namespace grpc_client
                 }
             }
 
-            Console.WriteLine("Total file size: {0} MB", fileSize / 1024 / 1024);
+            Console.WriteLine("Total file size: {0} KB", fileSize / 1024);
             if (fileExists)
             {
                 if (finalFile != tempFile)
