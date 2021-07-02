@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -15,7 +16,7 @@ namespace grpc_client
         {
             Console.WriteLine(Directory.GetCurrentDirectory());
             await GreetServer();
-            await GetFile(@"JetBrains.Rider-2021.1.3.exe");
+            await GetFile(@"test_file.txt");
         }
 
         private static async Task GreetServer()
@@ -42,16 +43,20 @@ namespace grpc_client
             var tempFile = $"temp_{DateTime.UtcNow.ToString("yyyyMMdd_HHmmss")}.tmp";
             var finalFile = tempFile;
             var fileCache = "";
-            long totalSizeOfFile = 0;
-
+            var fileExists = false;
+            long fileSize = 0;
             using (var call = client.DownloadFile(request))
             {
                 await using (var fs = File.OpenWrite(tempFile))
                 {
+                    var stopWatch = new Stopwatch();
+                    stopWatch.Start();
                     await foreach (var chunk in call.ResponseStream.ReadAllAsync().ConfigureAwait(false))
                     {
-                        totalSizeOfFile = chunk.FileSize;
+                        fileExists = chunk.FileSize != -1 && !chunk.IsCanceled;
+                        if (!fileExists) break;
                         fileCache = chunk.Md5Cache;
+                        fileSize = chunk.FileSize;
 
                         if (!string.IsNullOrEmpty(chunk.FileName)) finalFile = chunk.FileName;
 
@@ -65,15 +70,35 @@ namespace grpc_client
                             Console.WriteLine($"final chunk size: {chunk.ChunkSize}");
                         }
                     }
+
+                    stopWatch.Stop();
+                    // Get the elapsed time as a TimeSpan value.
+                    var ts = stopWatch.Elapsed;
+
+                    // Format and display the TimeSpan value.
+                    var elapsedTime = string.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                        ts.Hours, ts.Minutes, ts.Seconds,
+                        ts.Milliseconds);
+                    Console.WriteLine("File transfer took: " + elapsedTime);
                 }
             }
 
-            if (finalFile != tempFile)
-                File.Move(tempFile, finalFile);
-            Console.WriteLine(
-                fileCache == CheckMd5(finalFile)
-                    ? "Caches converged! File:{0} was transferred successfully!"
-                    : "Caches are different! File:{0} was NOT transferred successfully!", finalFile);
+            Console.WriteLine("Total file size: {0} MB", fileSize / 1024 / 1024);
+            if (fileExists)
+            {
+                if (finalFile != tempFile)
+                    File.Move(tempFile, finalFile);
+                Console.WriteLine(
+                    fileCache == CheckMd5(finalFile)
+                        ? "Caches converged! File: {0} was transferred successfully!"
+                        : "Caches are different! File: {0} was NOT transferred successfully!", finalFile);
+            }
+            else
+            {
+                File.Delete(tempFile);
+                File.Delete(finalFile);
+                Console.WriteLine("FILE DOES NOT EXIST");
+            }
         }
 
         private static string CheckMd5(string filename)

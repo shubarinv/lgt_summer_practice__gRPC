@@ -57,6 +57,17 @@ namespace grpc_server
                     await responseStream.WriteAsync(chunk).ConfigureAwait(false);
                 }
             }
+            else
+            {
+                var chunk = new ChunkMsg
+                {
+                    FileName = Path.GetFileName(filePath),
+                    FileSize = -1,
+                    Md5Cache = "NO FILE",
+                    IsCanceled = true
+                };
+                await responseStream.WriteAsync(chunk).ConfigureAwait(false);
+            }
         }
 
         private static string CalculateMd5(string filename)
