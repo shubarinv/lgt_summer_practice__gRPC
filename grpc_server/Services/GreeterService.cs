@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
+using ShubarinSummerPracticeGRPC;
 
 namespace grpc_server
 {

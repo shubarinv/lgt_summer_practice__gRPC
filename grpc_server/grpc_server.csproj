@@ -9,7 +9,8 @@
         <PackageReference Include="Grpc.AspNetCore" Version="2.28.0"/>
     </ItemGroup>
     <ItemGroup>
-        <Protobuf Include="Protos\greet.proto" GrpcServices="Server"/>
+        <Protobuf Include="..\Protos\Greeter.proto" GrpcServices="Server"/>
+        <Protobuf Include="..\Protos\FileTransfer.proto" GrpcServices="Server"/>
     </ItemGroup>
 
 </Project>

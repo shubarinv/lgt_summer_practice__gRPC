@@ -1,6 +1,6 @@
 ﻿syntax = "proto3";
 
-option csharp_namespace = "grpc_client";
+option csharp_namespace = "ShubarinSummerPracticeGRPC";
 
 package greet;
 
@@ -19,3 +19,4 @@ message HelloRequest {
 message HelloReply {
   string message = 1;
 }
+
