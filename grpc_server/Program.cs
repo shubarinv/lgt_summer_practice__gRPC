@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Server.Kestrel.Https;
+﻿using System.Net;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting;
 
 namespace grpc_server
@@ -17,9 +18,10 @@ namespace grpc_server
                 {
                     webBuilder.ConfigureKestrel(kestrelOptions =>
                     {
-                        kestrelOptions.ConfigureHttpsDefaults(httpsOptions =>
+                        kestrelOptions.Listen(IPAddress.Any, 5001, listenOptions =>
                         {
-                            httpsOptions.ClientCertificateMode = ClientCertificateMode.RequireCertificate;
+                            listenOptions.Protocols = HttpProtocols.Http2;
+                            listenOptions.UseHttps();
                         });
                     });
                     webBuilder.UseStartup<Startup>();

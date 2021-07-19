@@ -36,6 +36,7 @@ namespace grpc_server
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 // Communication with gRPC endpoints must be made through a gRPC client.

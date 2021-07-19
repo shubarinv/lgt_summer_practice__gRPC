@@ -49,6 +49,7 @@ namespace grpc_client
             {
                 await using (var fs = File.OpenWrite(tempFile))
                 {
+                    Console.WriteLine("Starting transfer of {0}", filePath);
                     var stopWatch = new Stopwatch();
                     stopWatch.Start();
                     await foreach (var chunk in call.ResponseStream.ReadAllAsync().ConfigureAwait(false))
@@ -97,7 +98,7 @@ namespace grpc_client
             {
                 File.Delete(tempFile);
                 File.Delete(finalFile);
-                Console.WriteLine("FILE DOES NOT EXIST");
+                Console.WriteLine("FILE ({0}) DOES NOT EXIST", filePath);
             }
         }
 
