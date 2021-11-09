@@ -97,7 +97,7 @@ namespace grpc_client
             {
                 File.Delete(tempFile);
                 File.Delete(finalFile);
-                Console.WriteLine("FILE DOES NOT EXIST");
+                Console.WriteLine("File does not exist");
             }
         }
 
